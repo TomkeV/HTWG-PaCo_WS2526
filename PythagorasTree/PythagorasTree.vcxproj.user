@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerEnvironment>PATH=%PATH%;$(ProjectDir)lib\OpenCL-SDK-v2025.07.23-Win-x64\bin;$(ProjectDir)lib\SDL2-2.32.10\lib\x64
+$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>--serial-depth 2 --openmp-depth 5 --opencl-depth 2</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerEnvironment>PATH=%PATH%;$(ProjectDir)lib\OpenCL-SDK-v2025.07.23-Win-x64\bin;$(ProjectDir)lib\SDL2-2.32.10\lib\x64
+$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>--serial-depth 2 --openmp-depth 5 --opencl-depth 2</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+</Project>

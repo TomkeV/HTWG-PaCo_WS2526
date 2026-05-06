@@ -1,1 +1,1 @@
-# HTWG-PaCo_WS2526
+# Pythagoras-Tree-3D

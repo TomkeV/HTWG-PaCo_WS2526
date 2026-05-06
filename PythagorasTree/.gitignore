@@ -1,0 +1,26 @@
+*.filters
+
+*.vsidx
+*.suo
+*.db
+
+x64/
+.vs/
+
+*.exe
+*.pdb
+
+# c / c++
+*.obj
+
+# libraries in lib directory (should be unzipped when cloned)
+# lib/  # yeah no just pushing it. 
+
+# latex
+*.aux
+*.fdb_latexmk
+*.fls 
+*.log 
+*.out
+*.gz
+*.toc

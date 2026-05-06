@@ -1,55 +1,25 @@
-# Prerequisites
-*.d
+*.filters
 
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
+*.vsidx
+*.suo
+*.db
 
-# Linker output
-*.ilk
-*.map
-*.exp
+x64/
+.vs/
 
-# Precompiled Headers
-*.gch
-*.pch
+# PythagorasTree/lib/
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
 *.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# Debug files
-*.dSYM/
-*.su
-*.idb
 *.pdb
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+# c / c++
+*.obj
 
-# debug information files
-*.dwo
+# latex
+*.aux
+*.fdb_latexmk
+*.fls 
+*.log 
+*.out
+*.gz
+*.toc
