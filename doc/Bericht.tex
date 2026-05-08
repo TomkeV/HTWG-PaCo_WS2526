@@ -1,0 +1,147 @@
+\documentclass[11pt]{report}
+\usepackage[german]{babel}
+\usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+% Bildunterschriften 
+\usepackage{caption}
+\captionsetup{font=footnotesize} % Schriftgröße
+\captionsetup{justification=centering} % Zentrierte Darstellung
+\usepackage{float} % Bildplatzierung
+\usepackage{graphicx}
+
+\usepackage{enumitem} % Paket für Anpassung von Listen
+\usepackage[bottom]{footmisc} % Fußnoten am Ende der Seite platzieren
+\usepackage{amsmath}
+
+
+
+\usepackage{pdfpages} % Includieren von PDF Dokumenten
+
+% Linkdarstellung
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,    % Links farbig hervorheben
+    linkcolor=blue,     % Farbe interne Links
+    urlcolor=blue,      % Farbe URLs
+}
+
+% Tabellenformatierung
+\usepackage{booktabs} % Für schönere Linien
+\usepackage{array}    % Für Spaltenanpassungen
+\usepackage{multirow} % Für mehrzeilige Zellen
+\usepackage{makecell} % Für Zellumbrüche
+
+% Code Ausschnitte
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{soul}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.70,0.70,0.70}
+
+\lstset{language=C,keywordstyle={\bfseries \color{blue}}}
+
+\lstdefinestyle{C_DTCO}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codepurple},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{orange},
+	frame=leftline|topline|bottomline|rightline,
+	frameround=tttt,
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=4pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=1
+}
+\lstset{style=C_DTCO}
+
+% Zeilenabstand
+\usepackage[onehalfspacing]{setspace}
+
+% Schriftart 
+\usepackage[scaled]{helvet}
+\usepackage[T1]{fontenc}
+\renewcommand\familydefault{\sfdefault}
+
+\title{Erzeugung eines 3D Pythagoras-Baums mit parallelen Technologien\\
+        \large{Endbericht aus dem Fach Parallel Computing unter der Leitung von Marko Fehrenbach\\
+                HTWG Konstanz | Wintersemester 2025 / 2026}
+}
+
+\author{Patrick Denz, Sofie Birkle, Tomke Velten}
+
+\begin{document}
+\pagenumbering{gobble}
+\renewcommand{\figurename}{Abb.} % Abbildungsbeschriftung
+\input{./chapters/Deckblatt}
+
+\centering
+\section*{Abstract}
+Pythagoras-Bäume sind Fraktale, deren Struktur sich aus einer wiederholten Anwendung derselben Operation auf eine Menge von Körpern ergibt. 
+Ziel dieser Arbeit war die Erzeugung eines dreidimensionalen Pythagoras-Baums (Quader statt Quadrate) und die anschließende Parallelisierung der Berechnung mit 
+unterschiedlichen Technologien. Ausgangspunkt war eine serielle Implementierung, die wir zunächst rekursiv und anschließend — zur besseren Parallelisierbarkeit
+— iterativ (ebenenweise) umgesetzt haben. Für die korrekte Platzierung der Quader im 3D-Raum war dabei eine Verwendung von Transformationsmatrizen notwendig. \\
+
+Darauf aufbauend parallelisierten wir datenparallel: OpenMP auf der CPU und OpenCL auf der GPU (bzw. auf PoCL/CPU, abhängig vom System). Neben der eigentlichen 
+Generierung floss auch die Aufbereitung für einen einfachen SDL-basierten Wireframe-Renderer in die Gesamtlaufzeit ein. \\
+
+Die Laufzeitmessungen auf mehreren Geräten zeigen, dass Parallelisierung bei kleinen Baumtiefen zunächst Overhead verursacht, bei größeren Tiefen jedoch deutliche 
+Beschleunigungen ermöglicht (z. B. OpenMP bis ca. 93\% Zeitersparnis, OpenCL je nach Tiefe bis ca. 87\%). Limitiert wird die maximal erreichbare Baumtiefe primär durch 
+den quadratisch wachsenden Speicherbedarf der Quaderdaten.
+
+\raggedright
+\tableofcontents
+\newpage
+
+\pagenumbering{arabic}
+\setcounter{secnumdepth}{2} % Setzt die Tiefe der Nummerierung
+\renewcommand\thesection{\arabic{section}} % Nummerierung der Hauptkapitel
+\renewcommand\thesubsection{\arabic{section}.\arabic{subsection}} % Nummerierung der Unterkapitel
+
+\setcounter{section}{-1} % Nummerierung bei 0 starten
+\input{chapters/0_Intro}
+
+\newpage
+\input{chapters/1_HW+Rendering} % DONE
+
+\newpage
+\input{chapters/2_Sequentiell}
+
+\newpage
+\input{chapters/3_Parallel}
+
+\newpage
+\input{chapters/4_Laufzeitvergleiche}
+
+\newpage
+\input{chapters/5_Speicher}
+
+\newpage
+\input{chapters/6_Verbesserungen}
+
+\newpage
+\input{chapters/7_Fazit}
+
+\newpage
+\section{Nobody is perfect}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\linewidth]{pictures/outtakes/Outtakes.png}
+\end{figure}
+\vfill
+% Anhang
+\section*{Anhang}\label{Anhang}
+\includepdf[pages=-, fitpaper=true]{appendix/Zeiten_seriell.pdf}
+\includepdf[pages=-, fitpaper=true]{appendix/Zeiten_parallel_ocl.pdf}
+\includepdf[pages=-, fitpaper=true]{appendix/Zeiten_parallel_omp.pdf}
+\includepdf[pages=-, fitpaper=true]{appendix/Auswertung_Zeitmessung.pdf}
+\includepdf[pages=-, fitpaper=true]{appendix/Amdahls_Law.pdf}
+\end{document}  

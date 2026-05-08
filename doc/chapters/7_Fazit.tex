@@ -1,0 +1,14 @@
+\section{Fazit}
+Im Rahmen dieser Arbeit konnten wir zeigen, dass sich die Erzeugung eines 3D Pythagoras-Baums gut als datenparalleles Problem
+modellieren lässt, da zwischen den Quadern keine Abhängigkeiten bestehen und somit kaum Synchronisation nötig ist. Entscheidend 
+für die erfolgreiche Parallelisierung war die Umstellung von einer rekursiven auf eine iterative, ebenenweise Berechnung, weil sich 
+nur so die Arbeit sinnvoll auf CPU-Kerne bzw. GPU-Threads verteilen lässt.\\
+Unsere Laufzeitanalyse zeigte, dass der Overhead paralleler Ansätze für kleine Baumtiefen (insbesondere bei OpenCL durch 
+Speichertransfer und Kernel-Setup) sehr groß ist, während bei größeren Tiefen deutliche Zeitgewinne möglich sind. OpenMP erwies 
+sich als überaus nützlich, während OpenCL zwar bei großen Tiefen Vorteile bringen kann, jedoch stark von 
+Hardware/Implementierung abhängt (z. B. PoCL-Effekt durch Wegfall des GPU-Transfers).\\
+Der zentrale limitierende Faktor unseres Projekts ist nicht die Rechenleistung, sondern der Speicher. Bereits ab ca. 21 Ebenen
+liegt der Bedarf allein für die Quaderdaten im Gigabyte-Bereich, bei 25 Ebenen im zweistelligen Gigabyte-Bereich.
+Deshalb waren Bäume mit mehr als ca. 23 Ebenen in der Praxis nicht mehr wirklich generierbar.\\
+Als naheliegende Weiterentwicklungen bieten sich insbesondere eine Pipeline-/Paketierung der OpenCL-Transfers, das Reduzieren 
+verbleibender kritischer Bereiche sowie eine stärkere Parallelisierung bzw. Beschleunigung des Renderers an.

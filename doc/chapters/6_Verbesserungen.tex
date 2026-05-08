@@ -1,0 +1,43 @@
+\section{Weitere Verbesserungen}
+\vspace{-0.25cm}
+Im Laufe unserer Projektumsetzung stießen wir an einigen Stellen auf Probleme, deren Beseitigung den zeitlichen Rahmen gesprengt hätte.
+Dennoch gab es eine Reihe von Ideen für mögliche Lösungen, auf welche wir im folgenden kurz eingehen: 
+
+\vspace{-0.25cm}
+\subsubsection*{Synchronisaton}
+\vspace{-0.25cm}
+Wie in \hyperref[3-2-rendering]{Abschnitt 3.2 Hinzufügen von Objekten zum Renderer} beschrieben, verwenden wir derzeit einen kritischen Bereich,
+um das Hinzufügen von Quadern zum Renderer fehlerfrei zu ermöglichen. Über ein Array vordefinierter Größe im Renderer sollte es möglich
+sein, diese Operation mit Hilfe der Thread-IDs zu parallelisieren. 
+
+\subsection*{OpenCL}
+\vspace{-0.25cm}
+\subsubsection*{Speicherverbrauch}
+\vspace{-0.25cm}
+Ein zentrales Problem der aktuellen OpenCL-Variante ist der Speicherbedarf auf dem Device. Für größere Baumtiefen übersteigt die benötigte Buffergröße den auf der GPU
+verfügbaren Speicherplatz, sodass OpenCL mit \texttt{CL\_MEM\_OBJECT\_ALLOCATION\_FAILURE (-4)} abbricht (vgl. \hyperref[openCL-Fehler]{Abschnitt 4.6})\\
+Eine Verbesserung könnte durch aufsplitten der Transfers bzw. Speicherobjekte erreicht werden. Statt für eine komplette Ebene einen großen 
+Eingabe- und Ausgabebuffer zu reservieren, könnte die Ebene in mehrere Pakete zerlegt werden, die nacheinander verarbeitet werden. 
+Dadurch sinkt die maximal benötigte Buffergröße und damit die Wahrscheinlichkeit, dass Allokationen aufgrund fragmentierten oder zu
+knappen Device-Speichers fehlschlagen.
+
+\vspace{-0.25cm}
+\subsubsection*{Optimierung der Blockgröße und -anzahl}
+\vspace{-0.25cm}
+Die Optimierung von Blockgröße und Blockanzahl erwies sich als schwierig. Der Hauptgrund ist, dass sich die Anzahl der zu verarbeitenden
+Quader pro Ebene verdoppelt, wodurch sich die optimale Verteilung stetig verändert.\\
+Als Ansatz zur Verbesserung bietet sich hier eine Pipelinestruktur an. Die Grundidee ist, fortlaufend Pakete von Quadern zu verarbeiten:
+Die CPU schickt ein Paket von Quadern an die GPU.
+Die GPU erzeugt daraus die neuen Quader (Folgeebene) und schreibt sie in einen Ausgabebuffer.
+Während die GPU bereits am nächsten Paket arbeitet, holt die CPU die Ergebnisse des vorherigen Pakets ab --- parallel dazu kann die CPU den Renderer 
+befüllen und die bereits generierten Quader zur Darstellung weiterreichen.\\
+So entsteht eine Überlappung von Rechenzeit und Transfer-/Verarbeitungszeit, weil die CPU den Renderer befüllt, während die GPU arbeitet.
+Im Idealfall reduziert dies Wartezeiten und steigert den Durchsatz des Systems. \\
+Ein praktischer Nebeneffekt wäre, dass die Blockgröße durch die Paketgröße automatisch beschränkt würde, was nicht nur die Wahl passender Work-Group-Größen
+erleichtert, sondern auch das zuvor beschrieben Problem mit den Speicherlimits reduzieren könnte.
+
+\newpage
+\subsection*{Renderer}
+Obwohl wir vor allem mit den parallelen Ansätzen theoretisch recht große Bäume generieren können, ist es uns praktisch derzeit nicht möglich, diese
+visuell aufzubereiten. Außerdem wäre in Anlehnung an den Fraktal-Charakter der Pythagorasbäume eine Zoom-Option im Renderer von Vorteil.\\
+Um die Effizienz unseres Renderers zu verbessern, böte sich Multithreading oder die Verwendung von Hardwarebeschleunigung an. 

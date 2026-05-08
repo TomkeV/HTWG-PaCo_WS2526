@@ -1,0 +1,82 @@
+\section{Hardware und Rendering}
+\subsection{Verwendete Hardware}\label{Hardware}
+\begin{table}[h]
+    \centering
+\begin{tabular}{@{}lccc@{}}
+    \toprule
+    \textbf{Produkt}         & \textbf{ThinkPad P15 Gen 2}                       & \textbf{ThinkPad P14s Gen 1}           & \textbf{ASUS ZenBook 13}            \\
+    \midrule
+    \textbf{Prozessor}       & \makecell{Intel Core \\ i7-11850H}          & \makecell{AMD Ryzen 7 \\ PRO 4750U}    & \makecell{AMD Ryzen 7 \\ 5800 U}  
+    \vspace{2mm} \\ % Abstand zwischen Sektionen
+    \textbf{Taktung (in GHz)}&                                             &                                        &                                     \\ 
+    minimale Frequenz:       & 2.5                                         & 1.7                                    & 1.9                                 \\ 
+    Boost (ein Kern):        & 4.8                                         & 4.1                                    & 4.4                                 \\ 
+    Boost (alle Kerne):      & (keine Angabe)                              & 3.1                                    & 3.4                       
+    \vspace{3mm} \\ % Abstand zwischen Sektionen 
+    \textbf{Parallelität}    &                                             &                                        &                                     \\
+    Kerne                    & 8                                           & 8                                      & 8                                   \\
+    Threads                  & 16                                          & 16                                     & 16 
+    \vspace{3mm} \\ % Abstand zwischen Sektionen
+    \textbf{RAM}             & 32 GB                                       & 24 GiB                                 & 16 GB                               \\ 
+    Taktung:                 & 3200 MHz                                    & 3200 MHz                               & 3200 MHz                   
+    \vspace{3mm}  \\ % Abstand zwischen Sektionen
+    \textbf{Grafikkarte}     & \makecell{Nvidia RTX \\ A3000}              & \makecell{AMD Radeon \\ RX Vega 7}     & \makecell{AMD Radeon \\ RX Vega 8}  \\ 
+    Größe:                   & 6 GB                                        & 2 GB                                   & 497 MB                     
+    \vspace{3mm} \\ % Abstand zwischen Sektionen
+    \textbf{Betriebssystem}  & Windows 10                                  & \makecell{Debian 13 \\ Kernel 6.12.63} & Windows 10                          \\ 
+    \bottomrule
+\end{tabular}
+    \caption{Überblick der Gerätespezifikationen verwendeter Laptops}
+\end{table}
+\noindent
+Während der Prozessor-Boost mit einem Kern für die Single-Thread-Performance relevant ist, ist der Boost mit mehreren Kernen 
+für die Multi-Thread-Performance von Bedeutung.
+\vspace{0.25cm}\\
+\noindent
+\textit{Anmerkung:} Auf dem Thinkpad P14s Gen 1 wurde OpenCL nicht nativ auf der Grafikkarte, sondern über PoCL\footnote{PoCL = Portable Computing Language --- 
+u.a. für x86-Architektur geeignete Implementierung von OpenCL} auf der CPU ausgeführt. Grund dafür waren Kooperationsprobleme zwischen der integrierten 
+AMD-Grafikkarte und den Linux-Treibern, die zu Systemabstürzen führten. Da dieses Problem ausschließlich auf dem Thinkpad P14s Gen 1 unter Linux auftrat und nicht
+bei Nvidia unter Linux oder ähnlichen AMD-Grafikchips unter Windows, deutet dies auf ein Treiberproblem hin, nicht auf ein Problem mit unserem Programm.
+
+\subsection{Crossplatform mit Linux und Windows}
+Das Projekt selbst ist lauffähig unter Windows und Linux, sofern \lstinline{nvidia-opencl-dev} (o.ä. für die jeweilig verbaute Hardware) 
+und \lstinline{libsdl2-dev} installiert sind. \\
+Im Makefile werden die Bibliotheken wie folgt verwendet: \lstinline{LFLAGS = -lSDL2 -lSDL2main -lOpenCL} 
+Für die Verwendung von OpenMP wird zusätzlich \lstinline{-fopenmp} bei den CXXFLAGS benötigt --- das Makefile des Linux-Projekts 
+selbst stammt aus einem Plugin für die Projektgenerierung für C++.  
+Da die Abgabe unter Windows mit Visual Studio 2022 erfolgen soll, haben wir den src-Ordner vom Visual Studio Projekt ins 
+Linux-Projektverzeichnis verlinkt. \\
+Eine Herausforderung während der Entwicklung für beide Plattformen war vor allem die Zeitmessung. Unter Linux wurde bei 
+paralleler Ausführung anfangs die Zeit für alle Threads aufsummiert, was dann quasi der Zeit entsprach, die die serielle Version
+benötigte. Unter Windows hingegen wurde die Zeit korrekt gemessen, allerdings fehlten hier die Funktionen, die zum Messen der 
+Zeit unter Linux nötig waren.\\
+Unsere Lösung war, die jeweilige Zeitmessung in einem Präprozessor-Block zu kapseln, sodass jede Plattform ihre eigene
+Implementierung verwenden kann. 
+
+\subsection{Renderer}
+Ein Pythagorasbaum definiert sich durch sein Aussehen. Dementsprechend benötigten wir zur Vollendung unseres Projekts eine Möglichkeit,
+unsere Ergebnisse visuell aufzubereiten. Da das Rendern von Grafiken kein wesentlicher Bestandteil der Lehrveranstaltung war, ließen wir uns
+bei der Entwicklung eines Renderers durch Chat-GPT 5 unterstützen. \\
+Unser Renderer verwendet zur Darstellunug der Daten die SDL-Bibliothek\footnote{SDL = Simple DirectMedia Layer; freie Multimedia-Bibliothek mit 
+Unterstützung vieler Plattformen}.\\
+\noindent
+Die Punkte werden dort mittels einer Projektionsmatrix auf die Bildfläche übertragen. Die so entstehenden Bildpunkte 
+werden anschließend mit der Information über die Verbindung untereinander (Kanten, engl. `Edges`) im dreidimensionalen 
+Raum zu einer Wireframe-Grafik\footnote{Wireframe = Grafik, welche ausschließlich aus Kanten/Ecken besteht und keine 
+Flächen beinhaltet} verarbeitet, da jede Verbindung im 3D-Raum direkt auf die 2D-Bildfläche übertragen werden kann. 
+So entsteht eine 2D-Projektion, welche auf dem Bildschirm angezeigt wird. Die Kamera kann mit Hilfe von WASD 
+nach links, rechts, oben und unten bewegt werden, wobei die Kamera immer auf einen Fixpunkt im Koordinatensystem
+gerichtet bleibt.\\
+Eine Redundanzprüfung, welche verhindern würde, dass übereinanderliegende und dadurch nicht sichtbare Punkte und 
+Linien gerendert werden, haben wir --- obwohl sie die Effizienz des Renderers maßgeblich steigern könnte --- nicht 
+implementiert, um uns auf die tatsächlichen Anforderungen des Kurses zu fokussieren. Um ein besseres visuelles 
+Erlebnis zu ermöglichen, haben wir die tatsächlich aufeinanderliegenden Kanten mit der Funktion 
+\texttt{removeRedundantEdges()} entfernt. 
+
+% - mit Hilfe von KI erstellt
+% - erstellt mit SDL (Simple Direct Media Layer) eine Wireframe-Grafik (nur Kanten/Ecken, keine Flächen)
+% - verarbeitet Punkte und Informationen über Verbindung selbiger (Edges) im dreidimensionalen Raum zu einer Projektion in 2D 
+% - auch doppelte Punkte / Linien werden ohne Prüfung der Sichtbarkeit verarbeitet -> keine Effizienzsteigerung durch Redundanzprüfung
+
+% Einbindung ins Projekt? 
+
